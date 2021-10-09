@@ -1,4 +1,5 @@
 import csv
+import json
 import os
 import matplotlib.pyplot as plt
 import matplotlib.cbook as cbook
@@ -404,7 +405,39 @@ def graph_deep(master_dict:dict):
     ax.set_ylabel('Deep plays against', fontsize=15)
     plt.show()
 
+def graph_ppda(master_dict:dict):
+    datapoints = len(master_dict["xG"])
+    ppda_loss = []
+    ppda_win = []
+    ppda_draw = []
+
+    ppdaA_loss = []
+    ppdaA_win = []
+    ppdaA_draw = []
+
+    for i in range(0,datapoints):
+        parsed_format = json.loads(master_dict["ppda"][i].replace("'","\""))
+        parsed_formatA = json.loads(master_dict["ppda_allowed"][i].replace("'","\""))
+        if master_dict["result"][i] == "w":
+            ppda_win.append(parsed_format["att"]/parsed_format["def"])
+            ppdaA_win.append(parsed_formatA["att"]/parsed_formatA["def"])
+        elif master_dict["result"][i] == "l":
+            ppda_loss.append(parsed_format["att"]/parsed_format["def"])
+            ppdaA_loss.append(parsed_formatA["att"]/parsed_formatA["def"])
+        else:
+            ppda_draw.append(parsed_format["att"]/parsed_format["def"])
+            ppdaA_draw.append(parsed_formatA["att"]/parsed_formatA["def"])
+
+    fig, ax = plt.subplots()
+    ax.scatter(ppda_win, ppdaA_win, c = 'green')
+    ax.scatter(ppda_loss, ppdaA_loss, c = 'red')
+    #ax.scatter(deep_draw, deepA_draw)
+
+    ax.set_xlabel('Home team PPDA', fontsize=15)
+    ax.set_ylabel('Away team PPDA', fontsize=15)
+    plt.show()
+
     
 if __name__ == "__main__":
     master = import_data()
-    graph_deep(master)
+    graph_ppda(master)
