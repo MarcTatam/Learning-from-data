@@ -1,5 +1,7 @@
 import csv
 import os
+import matplotlib.pyplot as plt
+import matplotlib.cbook as cbook
 
 def import_data()->dict:
     master_dict = {"xG" : [],
@@ -312,5 +314,97 @@ def import_data()->dict:
                 master_dict["result"].append(row[12])
     return master_dict
 
+def graph_xG(master_dict:dict):
+    datapoints = len(master_dict["xG"])
+    xG_loss = []
+    xG_win = []
+    xG_draw = []
+
+    xGA_loss = []
+    xGA_win = []
+    xGA_draw = []
+
+    for i in range(0,datapoints):
+        if master_dict["result"][i] == "w":
+            xG_win.append(float(master_dict["xG"][i]))
+            xGA_win.append(float(master_dict["xGA"][i]))
+        elif master_dict["result"][i] == "l":
+            xG_loss.append(float(master_dict["xG"][i]))
+            xGA_loss.append(float(master_dict["xGA"][i]))
+        else:
+            xG_draw.append(float(master_dict["xG"][i]))
+            xGA_draw.append(float(master_dict["xGA"][i]))
+
+    fig, ax = plt.subplots()
+    ax.scatter(xG_win, xGA_win, c = 'green')
+    ax.scatter(xG_loss, xGA_loss, c = 'red')
+    #ax.scatter(xG_draw, xGA_draw)
+
+    ax.set_xlabel('xG for', fontsize=15)
+    ax.set_ylabel('xG against', fontsize=15)
+    plt.show()
+
+def graph_npxG(master_dict:dict):
+    datapoints = len(master_dict["xG"])
+    npxG_loss = []
+    npxG_win = []
+    npxG_draw = []
+
+    npxGA_loss = []
+    npxGA_win = []
+    npxGA_draw = []
+
+    for i in range(0,datapoints):
+        if master_dict["result"][i] == "w":
+            npxG_win.append(float(master_dict["npxG"][i]))
+            npxGA_win.append(float(master_dict["npxGA"][i]))
+        elif master_dict["result"][i] == "l":
+            npxG_loss.append(float(master_dict["npxG"][i]))
+            npxGA_loss.append(float(master_dict["npxGA"][i]))
+        else:
+            npxG_draw.append(float(master_dict["npxG"][i]))
+            npxGA_draw.append(float(master_dict["npxGA"][i]))
+
+    fig, ax = plt.subplots()
+    ax.scatter(npxG_win, npxGA_win, c = 'green')
+    ax.scatter(npxG_loss, npxGA_loss, c = 'red')
+    #ax.scatter(npxG_draw, xGA_draw)
+
+    ax.set_xlabel('npxG for', fontsize=15)
+    ax.set_ylabel('npxG against', fontsize=15)
+    plt.show()
+
+def graph_deep(master_dict:dict):
+    datapoints = len(master_dict["xG"])
+    deep_loss = []
+    deep_win = []
+    deep_draw = []
+
+    deepA_loss = []
+    deepA_win = []
+    deepA_draw = []
+
+    for i in range(0,datapoints):
+        if master_dict["result"][i] == "w":
+            deep_win.append(int(master_dict["deep"][i]))
+            deepA_win.append(int(master_dict["deep_allowed"][i]))
+        elif master_dict["result"][i] == "l":
+            deep_loss.append(int(master_dict["deep"][i]))
+            deepA_loss.append(int(master_dict["deep_allowed"][i]))
+        else:
+            deep_draw.append(int(master_dict["deep"][i]))
+            deepA_draw.append(int(master_dict["deep_allowed"][i]))
+
+    fig, ax = plt.subplots()
+    ax.scatter(deep_win, deepA_win, c = 'green')
+    ax.scatter(deep_loss, deepA_loss, c = 'red')
+    #ax.scatter(deep_draw, deepA_draw)
+
+    ax.set_xlabel('Deep plays for', fontsize=15)
+    ax.set_ylabel('Deep plays against', fontsize=15)
+    plt.show()
+
+    
 if __name__ == "__main__":
-    import_data()
+    master = import_data()
+    graph_deep(master)
