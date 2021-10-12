@@ -401,11 +401,13 @@ def graph_deep(master_dict:dict):
             deepA_draw.append(int(master_dict["deep_allowed"][i]))
     fig, axes = plt.subplots(ncols=2)
     ax1, ax2 = axes
-    ax1.imshow(matrixw, origin = 'lower')
-    ax2.imshow(matrixl, origin = 'lower')
+    im1 = ax1.imshow(matrixw, origin = 'lower')
+    im2 = ax2.imshow(matrixl, origin = 'lower')
     
     ax1.set_title('Win')
     ax2.set_title('Loss')
+    plt.colorbar(im1)
+    plt.colorbar(im2)
     plt.show()
 
 def graph_ppda(master_dict:dict):
