@@ -3,6 +3,7 @@ import json
 import os
 import matplotlib.pyplot as plt
 import matplotlib.cbook as cbook
+import numpy as np
 
 def import_data()->dict:
     master_dict = {"xG" : [],
@@ -337,9 +338,11 @@ def graph_xG(master_dict:dict):
             xGA_draw.append(float(master_dict["xGA"][i]))
 
     fig, ax = plt.subplots()
-    ax.scatter(xG_win, xGA_win, c = 'green')
-    ax.scatter(xG_loss, xGA_loss, c = 'red')
-    #ax.scatter(xG_draw, xGA_draw)
+    scatterw = ax.scatter(xG_win, xGA_win, c = 'green')
+    scatterl = ax.scatter(xG_loss, xGA_loss, c = 'red')
+    #scatterd = ax.scatter(xG_draw, xGA_draw)
+
+    ax.legend([scatterw, scatterl], ["Win", "Loss"])
 
     ax.set_xlabel('xG for', fontsize=15)
     ax.set_ylabel('xG against', fontsize=15)
@@ -367,9 +370,11 @@ def graph_npxG(master_dict:dict):
             npxGA_draw.append(float(master_dict["npxGA"][i]))
 
     fig, ax = plt.subplots()
-    ax.scatter(npxG_win, npxGA_win, c = 'green')
-    ax.scatter(npxG_loss, npxGA_loss, c = 'red')
+    scatterw = ax.scatter(npxG_win, npxGA_win, c = 'green')
+    scatterl = ax.scatter(npxG_loss, npxGA_loss, c = 'red')
     #ax.scatter(npxG_draw, xGA_draw)
+
+    ax.legend([scatterw, scatterl], ["Win", "Loss"])
 
     ax.set_xlabel('npxG for', fontsize=15)
     ax.set_ylabel('npxG against', fontsize=15)
@@ -377,32 +382,30 @@ def graph_npxG(master_dict:dict):
 
 def graph_deep(master_dict:dict):
     datapoints = len(master_dict["xG"])
-    deep_loss = []
-    deep_win = []
+
     deep_draw = []
 
-    deepA_loss = []
-    deepA_win = []
+
     deepA_draw = []
+
+    matrixw = np.zeros((24,22))
+    matrixl = np.zeros((24,22))
 
     for i in range(0,datapoints):
         if master_dict["result"][i] == "w":
-            deep_win.append(int(master_dict["deep"][i]))
-            deepA_win.append(int(master_dict["deep_allowed"][i]))
+            matrixw[int(master_dict["deep"][i])][int(master_dict["deep_allowed"][i])] += 1
         elif master_dict["result"][i] == "l":
-            deep_loss.append(int(master_dict["deep"][i]))
-            deepA_loss.append(int(master_dict["deep_allowed"][i]))
+            matrixl[int(master_dict["deep"][i])][int(master_dict["deep_allowed"][i])] += 1
         else:
             deep_draw.append(int(master_dict["deep"][i]))
             deepA_draw.append(int(master_dict["deep_allowed"][i]))
-
-    fig, ax = plt.subplots()
-    ax.scatter(deep_win, deepA_win, c = 'green')
-    ax.scatter(deep_loss, deepA_loss, c = 'red')
-    #ax.scatter(deep_draw, deepA_draw)
-
-    ax.set_xlabel('Deep plays for', fontsize=15)
-    ax.set_ylabel('Deep plays against', fontsize=15)
+    fig, axes = plt.subplots(ncols=2)
+    ax1, ax2 = axes
+    ax1.imshow(matrixw, origin = 'lower')
+    ax2.imshow(matrixl, origin = 'lower')
+    
+    ax1.set_title('Win')
+    ax2.set_title('Loss')
     plt.show()
 
 def graph_ppda(master_dict:dict):
@@ -429,9 +432,12 @@ def graph_ppda(master_dict:dict):
             ppdaA_draw.append(parsed_formatA["att"]/parsed_formatA["def"])
 
     fig, ax = plt.subplots()
-    ax.scatter(ppda_win, ppdaA_win, c = 'green')
-    ax.scatter(ppda_loss, ppdaA_loss, c = 'red')
-    #ax.scatter(deep_draw, deepA_draw)
+    scatterw = ax.scatter(ppda_win, ppdaA_win, c = 'green')
+    scatterl = ax.scatter(ppda_loss, ppdaA_loss, c = 'red')
+    #scatterd, = ax.scatter(deep_draw, deepA_draw)
+   
+
+    ax.legend([scatterw, scatterl], ["Win", "Loss"])
 
     ax.set_xlabel('Home team PPDA', fontsize=15)
     ax.set_ylabel('Away team PPDA', fontsize=15)
@@ -440,4 +446,4 @@ def graph_ppda(master_dict:dict):
     
 if __name__ == "__main__":
     master = import_data()
-    graph_ppda(master)
+    graph_deep(master)
