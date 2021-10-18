@@ -41,19 +41,6 @@ def import_data()->dict:
                 master_dict["deep"].append(row[7])
                 master_dict["deep_allowed"].append(row[8])
                 master_dict["result"].append(row[12])
-    with open('understat_Bournemouth.csv') as csvfile:
-        bournemouthfile = csv.reader(csvfile)
-        for row in bournemouthfile:
-            if row[0] == "h" and row[0] != "h_a":
-                master_dict["xG"].append(row[1])
-                master_dict["xGA"].append(row[2])
-                master_dict["npxG"].append(row[3])
-                master_dict["npxGA"].append(row[4])
-                master_dict["ppda"].append(row[5])
-                master_dict["ppda_allowed"].append(row[6])
-                master_dict["deep"].append(row[7])
-                master_dict["deep_allowed"].append(row[8])
-                master_dict["result"].append(row[12])
     with open('understat_Brighton.csv') as csvfile:
         brightonfile = csv.reader(csvfile)
         for row in brightonfile:
@@ -210,19 +197,6 @@ def import_data()->dict:
                 master_dict["deep"].append(row[7])
                 master_dict["deep_allowed"].append(row[8])
                 master_dict["result"].append(row[12])
-    with open('understat_Norwich.csv') as csvfile:
-        norwichfile = csv.reader(csvfile)
-        for row in norwichfile:
-            if row[0] == "h" and row[0] != "h_a":
-                master_dict["xG"].append(row[1])
-                master_dict["xGA"].append(row[2])
-                master_dict["npxG"].append(row[3])
-                master_dict["npxGA"].append(row[4])
-                master_dict["ppda"].append(row[5])
-                master_dict["ppda_allowed"].append(row[6])
-                master_dict["deep"].append(row[7])
-                master_dict["deep_allowed"].append(row[8])
-                master_dict["result"].append(row[12])
     with open('understat_Sheffield_United.csv') as csvfile:
         sheffieldfile = csv.reader(csvfile)
         for row in sheffieldfile:
@@ -252,19 +226,6 @@ def import_data()->dict:
     with open('understat_Tottenham.csv') as csvfile:
         spursfile = csv.reader(csvfile)
         for row in spursfile:
-            if row[0] == "h" and row[0] != "h_a":
-                master_dict["xG"].append(row[1])
-                master_dict["xGA"].append(row[2])
-                master_dict["npxG"].append(row[3])
-                master_dict["npxGA"].append(row[4])
-                master_dict["ppda"].append(row[5])
-                master_dict["ppda_allowed"].append(row[6])
-                master_dict["deep"].append(row[7])
-                master_dict["deep_allowed"].append(row[8])
-                master_dict["result"].append(row[12])
-    with open('understat_Watford.csv') as csvfile:
-        watfordfile = csv.reader(csvfile)
-        for row in watfordfile:
             if row[0] == "h" and row[0] != "h_a":
                 master_dict["xG"].append(row[1])
                 master_dict["xGA"].append(row[2])
@@ -400,14 +361,54 @@ def graph_deep(master_dict:dict):
             deep_draw.append(int(master_dict["deep"][i]))
             deepA_draw.append(int(master_dict["deep_allowed"][i]))
     fig, axes = plt.subplots(ncols=2)
+    plt.subplots_adjust(wspace=0.25)
     ax1, ax2 = axes
     im1 = ax1.imshow(matrixw, origin = 'lower')
     im2 = ax2.imshow(matrixl, origin = 'lower')
     
     ax1.set_title('Win')
     ax2.set_title('Loss')
-    plt.colorbar(im1)
-    plt.colorbar(im2)
+    ax1.set_xlabel('Deep Allowed')
+    ax2.set_xlabel('Deep Allowed')
+    ax1.set_ylabel('Deep')
+    ax2.set_ylabel('Deep')
+
+    plt.colorbar(im1, ax = ax1, shrink = 0.6)
+    plt.colorbar(im2, ax = ax2, shrink = 0.6)
+    plt.show()
+
+def graph_poss(master_dict:dict):
+    datapoints = len(master_dict["xG"])
+    poss_loss = []
+    poss_win = []
+    poss_draw = []
+
+    possA_loss = []
+    possA_win = []
+    possA_draw = []
+
+    for i in range(0,datapoints):
+        parsed_format = json.loads(master_dict["ppda"][i].replace("'","\""))
+        parsed_formatA = json.loads(master_dict["ppda_allowed"][i].replace("'","\""))
+        if master_dict["result"][i] == "w":
+            poss_win.append(parsed_format["att"])
+            possA_win.append(parsed_formatA["att"])
+        elif master_dict["result"][i] == "l":
+            poss_loss.append(parsed_format["att"])
+            possA_loss.append(parsed_formatA["att"])
+        else:
+            poss_draw.append(parsed_format["att"])
+            possA_draw.append(parsed_formatA["att"])
+
+    fig, ax = plt.subplots()
+    scatterw = ax.scatter(poss_win, possA_win, c = 'green')
+    scatterl = ax.scatter(poss_loss, possA_loss, c = 'red')
+   
+
+    ax.legend([scatterw, scatterl], ["Win", "Loss"])
+
+    ax.set_xlabel('Away team passes', fontsize=15)
+    ax.set_ylabel('Home team passes', fontsize=15)
     plt.show()
 
 def graph_ppda(master_dict:dict):
@@ -448,4 +449,4 @@ def graph_ppda(master_dict:dict):
     
 if __name__ == "__main__":
     master = import_data()
-    graph_deep(master)
+    graph_poss(master)
