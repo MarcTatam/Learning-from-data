@@ -301,9 +301,9 @@ def graph_xG(master_dict:dict):
     fig, ax = plt.subplots()
     scatterw = ax.scatter(xG_win, xGA_win, c = 'green')
     scatterl = ax.scatter(xG_loss, xGA_loss, c = 'red')
-    #scatterd = ax.scatter(xG_draw, xGA_draw)
+    scatterd = ax.scatter(xG_draw, xGA_draw, c = 'orange')
 
-    ax.legend([scatterw, scatterl], ["Win", "Loss"])
+    ax.legend([scatterw, scatterl, scatterd], ["Win", "Loss", "Draw"])
 
     ax.set_xlabel('xG for', fontsize=15)
     ax.set_ylabel('xG against', fontsize=15)
@@ -449,4 +449,4 @@ def graph_ppda(master_dict:dict):
     
 if __name__ == "__main__":
     master = import_data()
-    graph_poss(master)
+    graph_xG(master)
