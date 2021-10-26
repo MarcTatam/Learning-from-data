@@ -1,3 +1,5 @@
+import matplotlib.pyplot as plt
+
 def precision(true_positives : int, false_positives : int)->float:
     """Calculates the precision of a classifier
 
@@ -60,3 +62,11 @@ def false_positive_rate(false_positives : int, true_negatives :int):
     A float representing the true positive rate of the classifier
     """
     return false_positives/(false_positives+true_negatives)
+
+def f_score_comparison(knn_list : list, to_be_renamed_list : list):
+    """Plots a graph comparing the f scores of the two different classification techniques
+
+    Args
+    knn_list list of the results for knn in the order true positives, false positives, true negatives, false negatives
+    knn_list list of the results for the other method in the order true positives, false positives, true negatives, false negatives
+    """
