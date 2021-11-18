@@ -2,6 +2,7 @@ import pandas as pd
 import glob
 import os
 import math
+import json
 
 class Point(object):
     def __init__(self, coord1,coord2,coord3,coord4,coord5,coord6, classification=None, distance=None):
@@ -49,7 +50,7 @@ def knn_classify(point:Point, classified_points:Point, k:int)->str:
                 best_points.reverse()
         elif classified_point < best_points[0]:
             i = 0
-            while classified_point < best_points[i] and i != k:
+            while i < len(best_points) and classified_point < best_points[i] and i != k:
                 i += 1
             if i == 0:
                 best_points.pop(0)
@@ -83,10 +84,27 @@ def open_files():
     frame = pd.concat(file_list, axis=0, ignore_index=True)
     return frame
 
+def format_files(frame)->[Point]:
+    points = []
+    for row in frame.itertuples():
+        parsed_format = json.loads(row[6].replace("'","\""))
+        parsed_formatA = json.loads(row[7].replace("'","\""))
+        temp_point = Point(row[2],row[3],row[8],row[9],parsed_format['att'],parsed_formatA['att'], classification=row[13])
+        points.append(temp_point)
+    return points
+        
+def classify_test(points:[Point]):
+    correct = 0
+    incorrect = 0
+    for i in points:
+        classification = knn_classify(i, points,5)
+        if classification == i.classification:
+            correct += 1
+        else:
+            incorrect += 1
+    print(correct/(correct+incorrect))
+
 if __name__ == "__main__":
-    test_point = Point(2,2,2,2,2,2)
-    point1 = Point(0,0,0,0,0,0,"l")
-    point2 = Point(1,1,1,1,1,1,"l")
-    point3 = Point(3,3,3,3,3,3,"w")
-    point4 = Point(3,3,3,3,3,3,"w")
-    print(knn_classify(test_point,[point1,point2,point3,point4],3))
+    frame = open_files()
+    points = format_files(frame)
+    classify_test(points)

@@ -1,11 +1,16 @@
 import math
+import json
+import os
+import glob
 import numpy as np
+import pandas as pd
 
 def sigmoid(z:float)->float:
     """Calculates the sigmoid of a given input
 
     Args
     z - weighted inputs"""
+    print(z)
     s = 1/(1+np.exp(-z))
     return s
 
@@ -51,7 +56,7 @@ def log_likelihood(predicted_probablities:list, actual_probabilities:list)->floa
     for i in range(len(actual_probabilities)):
         predicted = predicted_probablities[i]
         actual = actual_probabilities[i]
-        total += actual*math.log(predicted)+(1-y)*math.log((1-predicted))
+        total += actual*math.log(predicted)+(1-actual)*math.log((1-predicted))
     return -total/len(actual_probabilities)
 
 def predict(row:list, weights)->int:
@@ -70,15 +75,15 @@ def predict(row:list, weights)->int:
     else:
         return 0
 
-def gradient(observations:list, predictions: list, actuals:list):
+def gradients(observations:list, predictions: list, actuals:list):
     observation_count = len(observations)
-    total_loss = 0
-    for item in range(len(predictions)):
-        x_value= 0
-        for j in range(len(observations[0])):
-            x_value += observatios[item][j] **2
-        x_value = math.sqrt(x_value)
-        total_loss += (prediction[item] - actual[item])*x_value
+    dw = 0
+    db = 0
+    for i in range(len(observations)):
+        inaccuracy = predictions[i]-actual[i]
+        dw += (inaccuracy)/observation_count #to do dot product
+        db += (inaccuracy)/observation_count
+        
     return -total_loss/observation_count
 
 
@@ -98,7 +103,49 @@ def optimise(observations:list, actuals:list, weights:list, index:int, learning_
         while current_iter > 0:
             predictions = []
             for item in observations:
-                predictions.append(predict(item),weights)
+                predictions.append(predict(item,weights))
             weights[i] = weights[i] - learning_rate*gradient(observations,predictions,actuals)
             current_iter -=1
     return weights
+
+def open_files():
+    current_path = os.path.dirname(os.path.realpath(__file__))
+    all_files_path = glob.glob(current_path + "/*.csv")
+
+    file_list = []
+
+    for filename in all_files_path:
+        dataframe = pd.read_csv(filename, index_col=None, header=0)
+        file_list.append(dataframe)
+
+    frame = pd.concat(file_list, axis=0, ignore_index=True)
+    frame = frame[frame.h_a == "h"]
+    frame = frame[frame.result != "d"]
+  
+    return frame
+
+def format_files(frame)->([[float,float,int,int,int,int]],[str]):
+    rows = []
+    actual = []
+    for row in frame.itertuples():
+        parsed_format = json.loads(row[6].replace("'","\""))
+        parsed_formatA = json.loads(row[7].replace("'","\""))
+        this_row = [row[2],row[3],row[8],row[9],parsed_format['att'],parsed_formatA['att']]
+        rows.append(this_row)
+        if row[13] == "w":
+            actual.append(1)
+        else:
+            actual.append(0)
+    return rows, actual
+
+def test(points,classifis):
+    weights = [0,0,0,0,0,0]
+    for i in range(6):
+        weights = optimise(points,classifis,weights,i,0.1)
+    print(weights)
+
+
+if __name__ == "__main__":
+    frame = open_files()
+    rows,actual = format_files(frame)
+    test(rows,actual)

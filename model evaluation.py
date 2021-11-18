@@ -63,7 +63,7 @@ def false_positive_rate(false_positives : int, true_negatives :int):
     """
     return false_positives/(false_positives+true_negatives)
 
-def f_score_comparison(knn_list : list, to_be_renamed_list : list):
+def f_score_comparison(knn_list : list, logisitc_list : list):
     """Plots a graph comparing the f scores of the two different classification techniques
 
     Args
