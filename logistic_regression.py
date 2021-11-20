@@ -10,7 +10,6 @@ def sigmoid(z:float)->float:
 
     Args
     z - weighted inputs"""
-    print(z)
     s = 1/(1+np.exp(-z))
     return s
 
@@ -37,7 +36,7 @@ def calculate_input(values:list, weights:list)->float:
     float representing the z value of the sigmoid function"""
     total = 0
     for i in range(len(weights)):
-        if i == len(values):
+        if i == len(weights)-1:
             total += weights[i]
         else:
             total += values[i]*weights[i]
@@ -69,11 +68,7 @@ def predict(row:list, weights)->int:
     Returns
     An integer representing a predicted outcome (1 for win, 0 for loss)"""
     z = calculate_input(row, weights)
-    probability = sigmoid(z)
-    if probability > 0.5:
-        return 1
-    else:
-        return 0
+    return sigmoid(z)
 
 def gradients(observations:list, predictions: list, actuals:list):
     observation_count = len(observations)
@@ -81,14 +76,14 @@ def gradients(observations:list, predictions: list, actuals:list):
     db = 0
     for i in range(len(observations)):
         inaccuracy = predictions[i]-actual[i]
-        dw += (inaccuracy)/observation_count #to do dot product
+        dw += (inaccuracy)/observation_count
         db += (inaccuracy)/observation_count
         
     return -total_loss/observation_count
 
 
-def optimise(observations:list, actuals:list, weights:list, index:int, learning_rate:float, max_iter:int=100)->list:
-    """Optimises a given weight
+def optimise(observations:list, actuals:list, weights:list, learning_rate:float, max_iter:int=1000)->list:
+    """Optimises a set of weights
 
     Args
     observations - List of the observations
@@ -98,14 +93,17 @@ def optimise(observations:list, actuals:list, weights:list, index:int, learning_
     learning_rate - the learning rate
     max_iter - the maximum iterations
     """
-    for i in range(len(weights)):
-        current_iter = max_iter
-        while current_iter > 0:
-            predictions = []
-            for item in observations:
-                predictions.append(predict(item,weights))
-            weights[i] = weights[i] - learning_rate*gradient(observations,predictions,actuals)
-            current_iter -=1
+    for j in range(max_iter):
+        mse = 0
+        for row_ind in range(len(observations)):
+            row = observations[row_ind]
+            prediction = predict(row, weights)
+            error = actual[row_ind] - prediction
+            mse += error**2
+            for i in range(len(weights)-1):
+                weights[i] = weights[i] + learning_rate*error*prediction*(1-prediction)*row[i]
+            weights[len(weights)-1] = weights[len(weights)-1] + learning_rate * error * prediction * (1.0 - prediction)
+        print(mse)
     return weights
 
 def open_files():
@@ -124,28 +122,62 @@ def open_files():
   
     return frame
 
-def format_files(frame)->([[float,float,int,int,int,int]],[str]):
-    rows = []
+def format_files(frame)->([[float],[float],[int],[int],[int],[int]],[str]):
+    columns =[[],[],[],[],[],[]]
     actual = []
     for row in frame.itertuples():
         parsed_format = json.loads(row[6].replace("'","\""))
         parsed_formatA = json.loads(row[7].replace("'","\""))
-        this_row = [row[2],row[3],row[8],row[9],parsed_format['att'],parsed_formatA['att']]
-        rows.append(this_row)
+        columns[0].append(row[2])
+        columns[1].append(row[3])
+        columns[2].append(row[8])
+        columns[3].append(row[9])
+        columns[4].append(parsed_format['att'])
+        columns[5].append(parsed_formatA['att'])
         if row[13] == "w":
             actual.append(1)
         else:
             actual.append(0)
-    return rows, actual
+    return columns, actual
+
+def normalise(points:[[float],[float],[int],[int],[int],[int]])->[[float,float,float,float,float,float]]:
+    maxs = [max(points[0]),max(points[1]),max(points[2]),max(points[3]),max(points[4]),max(points[5])]
+    mins = [min(points[0]),min(points[1]),min(points[2]),min(points[3]),min(points[4]),min(points[5])]
+    rows = []
+    for i in range(len(points[0])):
+        this_row1 = (points[0][i]-mins[0])/(maxs[0]-mins[0])
+        this_row2 = (points[1][i]-mins[1])/(maxs[1]-mins[1])
+        this_row3 = (points[2][i]-mins[2])/(maxs[2]-mins[2])
+        this_row4 = (points[3][i]-mins[3])/(maxs[3]-mins[3])
+        this_row5 = (points[4][i]-mins[4])/(maxs[4]-mins[4])
+        this_row6 = (points[5][i]-mins[5])/(maxs[5]-mins[5])
+        this_row = [this_row1,this_row2,this_row3,this_row4,this_row5,this_row6]
+        rows.append(this_row)
+    return rows,mins,maxs
 
 def test(points,classifis):
-    weights = [0,0,0,0,0,0]
-    for i in range(6):
-        weights = optimise(points,classifis,weights,i,0.1)
-    print(weights)
+    weights = [1,-1,1,-1,1,-1,0]
+    weights = optimise(points,classifis,weights,0.15)
+    correct = 0
+    incorrect = 0
+    for row_ind in range(len(points)):
+        prediction = predict(points[row_ind],weights)
+        if prediction >= 0.5:
+            prediction = 1
+        else:
+            prediction  = 0
+        if prediction == classifis[row_ind]:
+            correct += 1
+        else:
+            incorrect += 1
+    return(correct/(correct+incorrect))
+        
+
+    
 
 
 if __name__ == "__main__":
     frame = open_files()
-    rows,actual = format_files(frame)
-    test(rows,actual)
+    columns,actual = format_files(frame)
+    rows,mins,maxs = normalise(columns)
+    print(test(rows,actual))

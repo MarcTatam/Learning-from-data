@@ -4,7 +4,7 @@ import os
 import math
 import json
 
-class Point(object):
+class Weighted_Point(object):
     def __init__(self, coord1,coord2,coord3,coord4,coord5,coord6, classification=None, distance=None):
         self.dimension1 = coord1
         self.dimension2 = coord2
@@ -23,8 +23,8 @@ class Point(object):
         distance5_squared = (self.dimension6-point2.dimension6)**2+distance4_squared
         return math.sqrt(distance5_squared)
     
-    def set_distance(self, unclassified_point):
-        self.distance = self.distance_to(unclassified_point)
+    def set_distance(self, unclassified_point,weight):
+        self.distance = self.distance_to(unclassified_point)*weight
 
     def __eq__(self, other):
         if other.distance is None or self.distance is None:
@@ -39,10 +39,13 @@ class Point(object):
         return self.distance < other.distance
 
 
-def knn_classify(point:Point, classified_points:Point, k:int)->str:
+def knn_classify(point:Weighted_Point, classified_points:Weighted_Point, k:int, weightw:float, weightl:float)->str:
     best_points = []
     for classified_point in classified_points:
-        classified_point.set_distance(point)
+        if classified_point.classification == "w":
+            classified_point.set_distance(point,weightw)
+        else:
+            classified_point.set_distance(point,weightl)
         if len(best_points) < k:
             best_points.append(classified_point)
             if len(best_points) == k:
@@ -84,20 +87,20 @@ def open_files():
     frame = pd.concat(file_list, axis=0, ignore_index=True)
     return frame
 
-def format_files(frame)->[Point]:
+def format_files(frame)->[Weighted_Point]:
     points = []
     for row in frame.itertuples():
         parsed_format = json.loads(row[6].replace("'","\""))
         parsed_formatA = json.loads(row[7].replace("'","\""))
-        temp_point = Point(row[2],row[3],row[8],row[9],parsed_format['att'],parsed_formatA['att'], classification=row[13])
+        temp_point = Weighted_Point(row[2],row[3],row[8],row[9],parsed_format['att'],parsed_formatA['att'], classification=row[13])
         points.append(temp_point)
     return points
         
-def classify_test(points:[Point]):
+def classify_test(points:[Weighted_Point]):
     correct = 0
     incorrect = 0
     for i in points:
-        classification = knn_classify(i, points,11)
+        classification = knn_classify(i, points,11,153/297,144/297)
         if classification == i.classification:
             correct += 1
         else:
