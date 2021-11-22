@@ -98,12 +98,11 @@ def optimise(observations:list, actuals:list, weights:list, learning_rate:float,
         for row_ind in range(len(observations)):
             row = observations[row_ind]
             prediction = predict(row, weights)
-            error = actual[row_ind] - prediction
+            error = actuals[row_ind] - prediction
             mse += error**2
             for i in range(len(weights)-1):
                 weights[i] = weights[i] + learning_rate*error*prediction*(1-prediction)*row[i]
             weights[len(weights)-1] = weights[len(weights)-1] + learning_rate * error * prediction * (1.0 - prediction)
-        print(mse)
     return weights
 
 def open_files():
