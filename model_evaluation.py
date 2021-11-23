@@ -49,6 +49,8 @@ def true_positive_rate(true_positives : int, false_negatives :int):
     Returns
     A float representing the true positive rate of the classifier
     """
+    if true_positives == 0 and false_negatives == 0:
+        return 0
     return true_positives/(true_positives+false_negatives)
 
 def false_positive_rate(false_positives : int, true_negatives :int):
@@ -61,7 +63,9 @@ def false_positive_rate(false_positives : int, true_negatives :int):
     Returns
     A float representing the true positive rate of the classifier
     """
-    return false_positives/(false_positives+true_negatives)
+    if false_positives == 0 and true_negatives == 0:
+        return 0
+    return false_positives/(false_positives + true_negatives)
 
 def f_score_comparison(knn_list : list, logisitc_list : list):
     """Plots a graph comparing the f scores of the two different classification techniques
