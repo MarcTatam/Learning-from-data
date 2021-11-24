@@ -5,7 +5,7 @@ import math
 import json
 
 class Weighted_Point(object):
-    def __init__(self, coord1,coord2,coord3,coord4,coord5,coord6, weight, classification=None, distance=None):
+    def __init__(self, coord1,coord2,coord3,coord4,coord5,coord6, weight = None, classification=None, distance=None):
         self.dimension1 = coord1
         self.dimension2 = coord2
         self.dimension3 = coord3
@@ -66,16 +66,14 @@ def knn_classify(point:Weighted_Point, classified_points:Weighted_Point, k:int)-
 
 def weighted_vote(points:[Weighted_Point]):
     w_sum = 0
-    l_sum = 0
+    total = 0
     for point in points:
-        if point.classification == "w":
+        if point.classification == 1:
             w_sum += point.weight
+            total += point.weight
         else:
-            l_sum += point.weight
-    if l_sum < w_sum:
-        return "w"
-    else:
-        return "l"
+            total += point.weight
+    return w_sum/total
 
 def open_files():
     current_path = os.path.dirname(os.path.realpath(__file__))
@@ -104,13 +102,18 @@ def format_files(frame)->([[float],[float],[int],[int],[int],[int]],[str]):
         columns[3].append(row[9])
         columns[4].append(parsed_format['att'])
         columns[5].append(parsed_formatA['att'])
-        actual.append(row[13])
+        if row[13] == "w":
+            actual.append(1)
+        else:
+            actual.append(0)
     return columns, actual
 
-def normalise(points:[[float],[float],[int],[int],[int],[int]], actuals: [str])->([Weighted_Point,[float,float,float,float,float,float],[float,float,float,float,float,float]]):
+def normalise(points:[[float],[float],[int],[int],[int],[int]], actuals: [int])->([Weighted_Point,[float,float,float,float,float,float],[float,float,float,float,float,float]]):
     maxs = [max(points[0]),max(points[1]),max(points[2]),max(points[3]),max(points[4]),max(points[5])]
     mins = [min(points[0]),min(points[1]),min(points[2]),min(points[3]),min(points[4]),min(points[5])]
     rows = []
+    weightw = len(actuals)/actuals.count(1)
+    weightl = len(actuals)/actuals.count(0)
     for i in range(len(points[0])):
         this_row1 = (points[0][i]-mins[0])/(maxs[0]-mins[0])
         this_row2 = (points[1][i]-mins[1])/(maxs[1]-mins[1])
@@ -119,11 +122,11 @@ def normalise(points:[[float],[float],[int],[int],[int],[int]], actuals: [str])-
         this_row5 = (points[4][i]-mins[4])/(maxs[4]-mins[4])
         this_row6 = (points[5][i]-mins[5])/(maxs[5]-mins[5])
         this_row = [this_row1,this_row2,this_row3,this_row4,this_row5,this_row6]
-        if actuals[i] == "w":
-            weight = 297/153
+        if actuals[i] == 1:
+            weight = weightw
         else:
-             weight = 297/144
-        temp_point = Weighted_Point(this_row1,this_row2,this_row3,this_row4,this_row5,this_row6, weight, classification = actuals[i])
+             weight = weightl
+        temp_point = Weighted_Point(this_row1,this_row2,this_row3,this_row4,this_row5,this_row6, weight = weight, classification = actuals[i])
         rows.append(temp_point)
     return rows,mins,maxs
         

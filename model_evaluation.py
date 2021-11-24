@@ -35,9 +35,9 @@ def f1_score(true_positives : int, false_positives : int, false_negatives :int)-
     Returns
     A float representing the F1 score of the classifier
     """
-    precision = precision(true_positives, false_positives)
-    recall = recall(true_positives, false_negatives)
-    return 2*((precision*recall)/(precision+recall))
+    precision_val = precision(true_positives, false_positives)
+    recall_val = recall(true_positives, false_negatives)
+    return 2*((precision_val*recall_val)/(precision_val+recall_val))
 
 def true_positive_rate(true_positives : int, false_negatives :int):
     """Calculates the true positive rate of a classifier
