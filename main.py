@@ -392,14 +392,14 @@ def lr_f1_epochs(test_points, actuals_test):
 
 def comparison(test_rows, test_actuals):
     test_points = row_to_point(test_rows)
-    trained_points = train_knn()[0]
-    trained_rows = train_logistic(0.0005,1000)
+    trained_points, actuals_train, mins, maxs = train_knn()
+    weights, trained_rows, mins, max, actuals_train = train_logistic(0.0005,1000)
     tp = 0
     fp = 0
     tn = 0
     fn = 0
-    for j in range(len(trained_points)):
-        classification = lr.predict(trained_points[j],weights)
+    for j in range(len(trained_rows)):
+        classification = lr.predict(trained_rows[j],weights)
         if classification >= 0.5 and actuals_train[j] >= 0.5:
             tp += 1
         elif classification >= 0.5 and actuals_train[j] < 0.5:
@@ -418,8 +418,8 @@ def comparison(test_rows, test_actuals):
     fp = 0
     tn = 0
     fn = 0
-    for j in range(len(test_points)):
-        classification = lr.predict(test_points[j],weights)
+    for j in range(len(test_rows)):
+        classification = lr.predict(test_rows[j],weights)
         if classification >= 0.5 and actuals_test[j] >= 0.5:
             tp += 1
         elif classification >= 0.5 and actuals_test[j] < 0.5:
@@ -434,10 +434,54 @@ def comparison(test_rows, test_actuals):
     print("F1 : " +str(me.f1_score(tp,fp,fn)))
     print("TPR : " + str(me.true_positive_rate(tp,fn)))
     print("FPR : " + str(me.false_positive_rate(fp,tn)))
+    tp = 0
+    fp = 0
+    tn = 0
+    fn = 0
+    for j in range(len(trained_points)):
+        classification = knn.knn_classify(trained_points[j],trained_points,5)
+        if classification > 1:
+            print(classification)
+        if classification >= 0.5 and actuals_train[j] >= 0.5:
+            tp += 1
+        elif classification >= 0.5 and actuals_train[j] < 0.5:
+            fp += 1
+        elif classification < 0.5 and actuals_train[j] < 0.5:
+            tn += 1
+        else:
+            fn += 1
+    print("------KNN Train------")
+    print("Precision : " + str(me.precision(tp,fp)))
+    print("Recall : " + str(me.recall(tp,fn)))
+    print("F1 : " +str(me.f1_score(tp,fp,fn)))
+    print("TPR : " + str(me.true_positive_rate(tp,fn)))
+    print("FPR : " + str(me.false_positive_rate(fp,tn)))
+    tp = 0
+    fp = 0
+    tn = 0
+    fn = 0
+    for j in range(len(test_points)):
+        classification = knn.knn_classify(test_points[j],trained_points,5)
+        if classification > 1:
+            print(classification)
+        if classification >= 0.5 and actuals_test[j] >= 0.5:
+            tp += 1
+        elif classification >= 0.5 and actuals_test[j] < 0.5:
+            fp += 1
+        elif classification < 0.5 and actuals_test[j] < 0.5:
+            tn += 1
+        else:
+            fn += 1
+    print("------KNN Test------")
+    print("Precision : " + str(me.precision(tp,fp)))
+    print("Recall : " + str(me.recall(tp,fn)))
+    print("F1 : " +str(me.f1_score(tp,fp,fn)))
+    print("TPR : " + str(me.true_positive_rate(tp,fn)))
+    print("FPR : " + str(me.false_positive_rate(fp,tn)))
     
 
 
 if __name__ == "__main__":
     weights, trained_points, actuals_train, mins, maxs = train_logistic(1,1)
     normalised_rows, actuals_test =  normalise_test(mins, maxs)
-    lr_f1_epochs(normalised_rows,actuals_test)
+    comparison(normalised_rows,actuals_test)
