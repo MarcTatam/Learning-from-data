@@ -409,6 +409,7 @@ def comparison(test_rows, test_actuals):
         else:
             fn += 1
     print("------Logistic Training------")
+    print("Accuracy : " + str(me.accuracy(tp+tn,tp+tn+fp+fn)))
     print("Precision : " + str(me.precision(tp,fp)))
     print("Recall : " + str(me.recall(tp,fn)))
     print("F1 : " +str(me.f1_score(tp,fp,fn)))
@@ -429,6 +430,7 @@ def comparison(test_rows, test_actuals):
         else:
             fn += 1
     print("------Logistic Test------")
+    print("Accuracy : " + str(me.accuracy(tp+tn,tp+tn+fp+fn)))
     print("Precision : " + str(me.precision(tp,fp)))
     print("Recall : " + str(me.recall(tp,fn)))
     print("F1 : " +str(me.f1_score(tp,fp,fn)))
@@ -451,6 +453,7 @@ def comparison(test_rows, test_actuals):
         else:
             fn += 1
     print("------KNN Train------")
+    print("Accuracy : " + str(me.accuracy(tp+tn,tp+tn+fp+fn)))
     print("Precision : " + str(me.precision(tp,fp)))
     print("Recall : " + str(me.recall(tp,fn)))
     print("F1 : " +str(me.f1_score(tp,fp,fn)))
@@ -473,6 +476,7 @@ def comparison(test_rows, test_actuals):
         else:
             fn += 1
     print("------KNN Test------")
+    print("Accuracy : " + str(me.accuracy(tp+tn,tp+tn+fp+fn)))
     print("Precision : " + str(me.precision(tp,fp)))
     print("Recall : " + str(me.recall(tp,fn)))
     print("F1 : " +str(me.f1_score(tp,fp,fn)))

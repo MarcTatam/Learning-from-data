@@ -12,6 +12,9 @@ def precision(true_positives : int, false_positives : int)->float:
     """
     return true_positives/(true_positives+false_positives)
 
+def accuracy(correct_results: int, total_results)->float:
+    return correct_results/ total_results
+
 def recall(true_positives : int, false_negatives :int)->float:
     """Calculates the recall of a classifier
 
