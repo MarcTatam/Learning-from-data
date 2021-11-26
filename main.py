@@ -517,8 +517,8 @@ def knn_graphs(trained_points, test_points):
     test_win = ax.scatter(test_wins_for, test_wins_against, c="b")
     test_loss = ax.scatter(test_loss_for, test_loss_against, c="orange")
     ax.legend([train_win, train_loss, test_win, test_loss], ["Train Win", "Train Loss","Test Win", "Test Loss"])
-    plt.xlabel("Normalised Passes for")
-    plt.ylabel("Normalised Passes against")
+    plt.ylabel("Normalised Passes for")
+    plt.xlabel("Normalised Passes against")
     plt.show()
 
 def knn_graphs_correctness(trained_points, actuals_train, test_points, actuals_test):
@@ -529,17 +529,17 @@ def knn_graphs_correctness(trained_points, actuals_train, test_points, actuals_t
     for j in range(len(trained_points)):
         classification = knn.knn_classify(trained_points[j],trained_points,5)
         if classification >= 0.5 and actuals_train[j] >= 0.5:
-            training_correct_for.append(trained_points[j].dimension1)
-            training_correct_against.append(trained_points[j].dimension2)
+            training_correct_for.append(trained_points[j].dimension5)
+            training_correct_against.append(trained_points[j].dimension6)
         elif classification >= 0.5 and actuals_train[j] < 0.5:
-            training_incorrect_for.append(trained_points[j].dimension1)
-            training_incorrect_against.append(trained_points[j].dimension2)
+            training_incorrect_for.append(trained_points[j].dimension5)
+            training_incorrect_against.append(trained_points[j].dimension6)
         elif classification < 0.5 and actuals_train[j] < 0.5:
-            training_correct_for.append(trained_points[j].dimension1)
-            training_correct_against.append(trained_points[j].dimension2)
+            training_correct_for.append(trained_points[j].dimension5)
+            training_correct_against.append(trained_points[j].dimension6)
         else:
-            training_incorrect_for.append(trained_points[j].dimension1)
-            training_incorrect_against.append(trained_points[j].dimension2)
+            training_incorrect_for.append(trained_points[j].dimension5)
+            training_incorrect_against.append(trained_points[j].dimension6)
     test_correct_for  = []
     test_correct_against  = []
     test_incorrect_for  = []
@@ -547,26 +547,26 @@ def knn_graphs_correctness(trained_points, actuals_train, test_points, actuals_t
     for j in range(len(test_points)):
         classification = knn.knn_classify(test_points[j],trained_points,5)
         if classification >= 0.5 and actuals_test[j] >= 0.5:
-            test_correct_for.append(test_points[j].dimension1)
-            test_correct_against.append(test_points[j].dimension2)
+            test_correct_for.append(test_points[j].dimension5)
+            test_correct_against.append(test_points[j].dimension6)
         elif classification >= 0.5 and actuals_test[j] < 0.5:
-            test_incorrect_for.append(test_points[j].dimension1)
-            test_incorrect_against.append(test_points[j].dimension2)
+            test_incorrect_for.append(test_points[j].dimension5)
+            test_incorrect_against.append(test_points[j].dimension6)
         elif classification < 0.5 and actuals_test[j] < 0.5:
-            test_correct_for.append(test_points[j].dimension1)
-            test_correct_against.append(test_points[j].dimension2)
+            test_correct_for.append(test_points[j].dimension5)
+            test_correct_against.append(test_points[j].dimension6)
         else:
-            test_incorrect_for.append(test_points[j].dimension1)
-            test_incorrect_against.append(test_points[j].dimension2)
+            test_incorrect_for.append(test_points[j].dimension5)
+            test_incorrect_against.append(test_points[j].dimension6)
     ax = plt.axes()
     train_correct = ax.scatter(training_correct_for, training_correct_against, c="g")
     train_incorrect = ax.scatter(training_incorrect_for, training_incorrect_against, c="r")
     test_correct = ax.scatter(test_correct_for, test_correct_against, c="b")
     test_incorrect = ax.scatter(test_incorrect_for, test_incorrect_against, c="orange")
-    ax.plot([0, 1], [0, 1],'r--')
+    #ax.plot([0, 1], [0, 1],'r--')
     ax.legend([train_correct, train_incorrect, test_correct, test_incorrect], ["Train Correct", "Train Incorrect","Test Correct", "Test Incorrect"])
-    plt.xlabel("Normalised xG for")
-    plt.ylabel("Normalised xG against")
+    plt.ylabel("Normalised Passes for")
+    plt.xlabel("Normalised Passes against")
     plt.show()
 
 def lr_graphs(trained_rows, test_rows, weights):
@@ -602,8 +602,8 @@ def lr_graphs(trained_rows, test_rows, weights):
     test_win = ax.scatter(test_wins_for, test_wins_against, c="b")
     test_loss = ax.scatter(test_loss_for, test_loss_against, c="orange")
     ax.legend([train_win, train_loss, test_win, test_loss], ["Train Win", "Train Loss","Test Win", "Test Loss"])
-    plt.xlabel("Normalised Passes for")
-    plt.ylabel("Normalised Passes against")
+    plt.ylabel("Normalised Passes for")
+    plt.xlabel("Normalised Passes against")
     plt.show()
 
 def lr_graphs_correctness(trained_rows, actuals_train, test_rows, actuals_test,weights):
@@ -650,13 +650,13 @@ def lr_graphs_correctness(trained_rows, actuals_train, test_rows, actuals_test,w
     test_incorrect = ax.scatter(test_incorrect_for, test_incorrect_against, c="orange")
     #ax.plot([0, 1], [0, 1],'r--')
     ax.legend([train_correct, train_incorrect, test_correct, test_incorrect], ["Train Correct", "Train Incorrect","Test Correct", "Test Incorrect"])
-    plt.xlabel("Normalised Passes for")
-    plt.ylabel("Normalised Passes against")
+    plt.ylabel("Normalised Passes for")
+    plt.xlabel("Normalised Passes against")
     plt.show()
 
 
 if __name__ == "__main__":
-    weights, trained_points, mins, maxs, actuals_train = train_logistic(0.0005, 1000)
+    weights, trained_points, mins, maxs, actuals_train  = train_logistic(0.0005, 1000)
     normalised_rows, actuals_test =  normalise_test(mins, maxs)
     #normalised_points = row_to_point(normalised_rows)
-    lr_graphs_correctness(trained_points, actuals_train, normalised_rows, actuals_test, weights)
+    lr_graphs(trained_points,normalised_rows, weights)
