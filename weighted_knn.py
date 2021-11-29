@@ -5,7 +5,11 @@ import math
 import json
 
 class Weighted_Point(object):
+    """A class representing the position of a point in space"""
     def __init__(self, coord1,coord2,coord3,coord4,coord5,coord6, weight = None, classification=None, distance=None):
+        """Constructor
+        
+        Args"""
         self.dimension1 = coord1
         self.dimension2 = coord2
         self.dimension3 = coord3

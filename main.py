@@ -7,36 +7,66 @@ import logistic_regression as lr
 import weighted_knn as knn
 import model_evaluation as me
 
-def open_files():
+def open_files()-> pd.DataFrame:
+    """ Opens the files 
+
+    Returns a dataframe with all the data from the CSV files
+    """
     current_path = os.path.dirname(os.path.realpath(__file__))
     all_files_path = glob.glob(current_path + "/*.csv")
-
     file_list = []
-
     for filename in all_files_path:
         dataframe = pd.read_csv(filename, index_col=None, header=0)
         file_list.append(dataframe)
-
     frame = pd.concat(file_list, axis=0, ignore_index=True)
     frame = frame[frame.h_a == "h"]
     frame = frame[frame.result != "d"]
     return frame
 
-def select_rows(frame):
+def select_rows(frame: pd.DataFrame)->(pd.DataFrame,pd.DataFrame):
+    """Separates the training and test data
+
+    Args
+    Frame - a dataframe representing all the data
+
+    Returns two frames, one representing the training data and the other the test data
+    """
     train, test = train_test_split(frame, test_size=0.2)
     return train, test
 
 def save_files(train_frame, test_frame):
+    """ Saves the test and training data to their own files
+
+    Args
+    train_frame - dataframe representing the training data
+    test_frame - dataframe representing the test data
+    """
     train_frame.to_csv("train.csv")
     test_frame.to_csv("test.csv")
 
 def open_train()->pd.DataFrame:
-     return pd.read_csv("train.csv", index_col=None, header=0)
+    """ Opens the training data
+
+    returns a dataframe representing the training data
+    """
+    return pd.read_csv("train.csv", index_col=None, header=0)
 
 def open_test()->pd.DataFrame:
-     return pd.read_csv("test.csv", index_col=None, header=0)
+    """ Opens the training data
 
-def normalise_test(mins, maxs):
+    returns a dataframe representing the test data
+    """
+    return pd.read_csv("test.csv", index_col=None, header=0)
+
+def normalise_test(mins: [float], maxs: [float])->([[float]],[int]):
+    """ Normalises the data in the test set
+    
+    Args
+    mins - list containg the minimum value for each column
+    maxs - list containg the maximum value for each column
+
+    Returns a list containing a list of lists of floats representing each row in the data in normalised form and a list of classifications
+    """
     test_data = []
     frame = open_test()
     formatted_rows, actuals = lr.format_files(frame)
@@ -47,7 +77,13 @@ def normalise_test(mins, maxs):
         test_data.append(row)
     return test_data, actuals
 
-def row_to_point(test_data):
+def row_to_point(test_data:[[float]])->[knn.Weighted_Point]:
+    """Converts the data from row format to weighted point format
+    
+    Args
+    test_data - data in row format
+    
+    Returns a list of points in space for knn"""
     points = []
     for row in test_data:
         point = knn.Weighted_Point(row[0],row[1],row[2],row[3],row[4],row[5])
@@ -56,22 +92,30 @@ def row_to_point(test_data):
 
 
 def train_logistic(learning_rate, epochs)->[float]:
+    """Trains the logistic model
+
+    Args
+    learning_rate - learning rate to use
+    Epochs - number of iterations to train the model.
+
+    returns a list of weights, the normalised rows, the min and max values for normalisation and the rows actual classification
+    """
     formatted_rows, actuals = lr.format_files(open_train())
     normalised_rows, mins, maxs = lr.normalise(formatted_rows)
     weights = lr.optimise(normalised_rows, actuals, [0,0,0,0,0,0,0], learning_rate, max_iter = epochs)
     return weights, normalised_rows, mins, maxs, actuals
 
 def train_knn():
+    """Trains the KNN model
+
+    returns a list of normalised points, their actual classification and the min and max values for normalisation
+    """
     formatted_rows, actuals = knn.format_files(open_train())
     normalised_points, mins, maxs = knn.normalise(formatted_rows, actuals)
     return normalised_points, actuals, mins, maxs
 
 def test_logistic(normalised_rows, actuals, weights)->[int]:
-    """
-    1 - True Positive
-    2 - False Positive
-    3 - True Negative
-    4 - False Negative
+    """!!!!!DEPRECATED!!!!!
     """
     types = []
     for i in range(len(normalised_rows)):
@@ -87,11 +131,7 @@ def test_logistic(normalised_rows, actuals, weights)->[int]:
     return types
 
 def test_knn(points, actuals, weights)->[int]:
-    """
-    1 - True Positive
-    2 - False Positive
-    3 - True Negative
-    4 - False Negative
+    """!!!!!DEPRECATED!!!!!
     """
     types =[]
     for i in range(len(points)):
@@ -106,6 +146,12 @@ def test_knn(points, actuals, weights)->[int]:
             types.append(4)
 
 def graph_roc_lr_train(weights, points, actuals):
+    """Graphs ROC curve for logistic regression using the training data
+    
+    Args
+    weights - the weights for logistic regression classification
+    points - the rows used in the training data
+    actuals - the classification of the rows"""
     y_axis = []
     x_axis = []
     for i in range(1,1000):
@@ -136,6 +182,12 @@ def graph_roc_lr_train(weights, points, actuals):
     plt.show()
 
 def graph_roc_lr_test(weights, points, actuals):
+    """Graphs ROC curve for logistic regression using the test data
+    
+    Args
+    weights - the weights for logistic regression classification
+    points - the test rows
+    actuals - the classification of the rows"""
     y_axis = []
     x_axis = []
     for i in range(1,1000):
@@ -169,7 +221,6 @@ def graph_roc_knn_train(points, actuals):
     y_axis = []
     x_axis = []
     for i in range(1,100):
-        print(i)
         threshold = 1/i
         tp = 0
         fp = 0
@@ -295,7 +346,7 @@ def lr_f1_lr(test_points, actuals_test):
     y_values2 = []
     for i in range(1,21):
         print(i)
-        learning_rate = i/20
+        learning_rate = i/200
         weights, trained_points, mins, maxs, actuals_train = train_logistic(learning_rate,1000)
         tp = 0
         fp = 0
@@ -658,5 +709,6 @@ def lr_graphs_correctness(trained_rows, actuals_train, test_rows, actuals_test,w
 if __name__ == "__main__":
     weights, trained_points, mins, maxs, actuals_train  = train_logistic(0.0005, 1000)
     normalised_rows, actuals_test =  normalise_test(mins, maxs)
+    print(weights)
     #normalised_points = row_to_point(normalised_rows)
-    lr_graphs(trained_points,normalised_rows, weights)
+    #lr_f1_lr(normalised_rows, actuals_test)
