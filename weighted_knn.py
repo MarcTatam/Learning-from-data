@@ -7,9 +7,6 @@ import json
 class Weighted_Point(object):
     """A class representing the position of a point in space"""
     def __init__(self, coord1,coord2,coord3,coord4,coord5,coord6, weight = None, classification=None, distance=None):
-        """Constructor
-        
-        Args"""
         self.dimension1 = coord1
         self.dimension2 = coord2
         self.dimension3 = coord3
@@ -44,7 +41,16 @@ class Weighted_Point(object):
         return self.distance < other.distance
 
 
-def knn_classify(point:Weighted_Point, classified_points:Weighted_Point, k:int)->str:
+def knn_classify(point:Weighted_Point, classified_points:[Weighted_Point], k:int)->str:
+    """Classifies a point
+    
+    Args
+    point - point to classify
+    classified_points - list of classified points
+    k - number of points to use for classification
+
+    returns a classification
+    """
     best_points = []
     for classified_point in classified_points:
         if classified_point.classification == "w":
@@ -69,6 +75,12 @@ def knn_classify(point:Weighted_Point, classified_points:Weighted_Point, k:int)-
     return weighted_vote(best_points)
 
 def weighted_vote(points:[Weighted_Point]):
+    """Votes on the classification of points
+    
+    Args
+    points - closest points
+    
+    returns a classification"""
     w_sum = 0
     total = 0
     for point in points:
@@ -79,7 +91,10 @@ def weighted_vote(points:[Weighted_Point]):
             total += point.weight
     return w_sum/total
 
-def open_files():
+def open_files()->pd.DataFrame:
+    """Opens the files
+    
+    returns a frame holding the data"""
     current_path = os.path.dirname(os.path.realpath(__file__))
     all_files_path = glob.glob(current_path + "/*.csv")
 
@@ -94,7 +109,14 @@ def open_files():
     frame = frame[frame.result != "d"]
     return frame
 
-def format_files(frame)->([[float],[float],[int],[int],[int],[int]],[str]):
+def format_files(frame:pd.DataFrame)->([[float],[float],[int],[int],[int],[int]],[int]):
+    """Formats the files into a workable format
+    
+    Args
+    frame - frame holding data
+    
+    returns a list with each column and the actual classification
+    """
     columns =[[],[],[],[],[],[]]
     actual = []
     for row in frame.itertuples():
@@ -113,6 +135,11 @@ def format_files(frame)->([[float],[float],[int],[int],[int],[int]],[str]):
     return columns, actual
 
 def normalise(points:[[float],[float],[int],[int],[int],[int]], actuals: [int])->([Weighted_Point,[float,float,float,float,float,float],[float,float,float,float,float,float]]):
+    """Normalises the data
+    
+    Args
+    points - points to normalise
+    actuals - True classification of points"""
     maxs = [max(points[0]),max(points[1]),max(points[2]),max(points[3]),max(points[4]),max(points[5])]
     mins = [min(points[0]),min(points[1]),min(points[2]),min(points[3]),min(points[4]),min(points[5])]
     rows = []

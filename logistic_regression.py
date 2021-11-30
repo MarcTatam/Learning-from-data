@@ -70,18 +70,6 @@ def predict(row:list, weights)->int:
     z = calculate_input(row, weights)
     return sigmoid(z)
 
-def gradients(observations:list, predictions: list, actuals:list):
-    observation_count = len(observations)
-    dw = 0
-    db = 0
-    for i in range(len(observations)):
-        inaccuracy = predictions[i]-actual[i]
-        dw += (inaccuracy)/observation_count
-        db += (inaccuracy)/observation_count
-        
-    return -total_loss/observation_count
-
-
 def optimise(observations:list, actuals:list, weights:list, learning_rate:float, max_iter:int=1000)->list:
     """Optimises a set of weights
 
@@ -106,6 +94,9 @@ def optimise(observations:list, actuals:list, weights:list, learning_rate:float,
     return weights
 
 def open_files():
+    """Opens the files
+    
+    returns a frame holding the data"""
     current_path = os.path.dirname(os.path.realpath(__file__))
     all_files_path = glob.glob(current_path + "/*.csv")
 
@@ -121,7 +112,14 @@ def open_files():
   
     return frame
 
-def format_files(frame)->([[float],[float],[int],[int],[int],[int]],[str]):
+def format_files(frame)->([[float],[float],[int],[int],[int],[int]],[int]):
+    """Formats the files into a workable format
+    
+    Args
+    frame - frame holding data
+    
+    returns a list with each column and the actual classification
+    """
     columns =[[],[],[],[],[],[]]
     actual = []
     for row in frame.itertuples():
@@ -140,6 +138,11 @@ def format_files(frame)->([[float],[float],[int],[int],[int],[int]],[str]):
     return columns, actual
 
 def normalise(points:[[float],[float],[int],[int],[int],[int]])->[[float,float,float,float,float,float]]:
+    """Normalises the data
+    
+    Args
+    points - points to normalise
+    actuals - True classification of points"""
     maxs = [max(points[0]),max(points[1]),max(points[2]),max(points[3]),max(points[4]),max(points[5])]
     mins = [min(points[0]),min(points[1]),min(points[2]),min(points[3]),min(points[4]),min(points[5])]
     rows = []

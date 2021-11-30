@@ -218,6 +218,11 @@ def graph_roc_lr_test(weights, points, actuals):
     plt.show()
 
 def graph_roc_knn_train(points, actuals):
+    """Graphs ROC curve for knn using the training data
+    
+    Args
+    points - the points used in the training data
+    actuals - the classification of the points"""
     y_axis = []
     x_axis = []
     for i in range(1,100):
@@ -248,6 +253,12 @@ def graph_roc_knn_train(points, actuals):
     plt.show()
 
 def graph_roc_knn_test(points, classified_points, actuals):
+    """Graphs ROC curve for knn using the test data
+    
+    Args
+    points - the points used in the test data
+    classified_points - the classsified points
+    actuals - the classification of the test points"""
     y_axis = []
     x_axis = []
     classifis = []
@@ -288,6 +299,14 @@ def graph_roc_knn_test(points, classified_points, actuals):
     plt.show()
 
 def knn_f1(trained_points, test_points, actuals_train, actuals_test):
+    """Graphs the performance of knn as K changes
+
+    Args
+    trained_points - points in the training set
+    test_points - points in the test set
+    actuals_train - classification of training points
+    actuals_test - classification of test points
+    """
     x_values1  = []
     y_values1  = []
     for i in range(1,31):
@@ -340,6 +359,12 @@ def knn_f1(trained_points, test_points, actuals_train, actuals_test):
     plt.show()
 
 def lr_f1_lr(test_points, actuals_test):
+    """Graphs f1 as the learning rate changes
+
+    Args
+    test_points - Test set
+    actuals_test - classification of test set
+    """
     x_values1  = []
     y_values1  = []
     x_values2 = []
@@ -391,6 +416,12 @@ def lr_f1_lr(test_points, actuals_test):
     plt.show()
 
 def lr_f1_epochs(test_points, actuals_test):
+    """Graphs f1 as the number of iterations changes
+
+    Args
+    test_points - Test set
+    actuals_test - classification of test set
+    """
     x_values1  = []
     y_values1  = []
     x_values2 = []
@@ -442,6 +473,12 @@ def lr_f1_epochs(test_points, actuals_test):
     plt.show()
 
 def comparison(test_rows, test_actuals):
+    """Calculates perfomence metrics
+
+    Args
+    test_rows - Test set
+    test_actuals - classification of test set
+    """
     test_points = row_to_point(test_rows)
     trained_points, actuals_train, mins, maxs = train_knn()
     weights, trained_rows, mins, max, actuals_train = train_logistic(0.0005,1000)
@@ -535,6 +572,12 @@ def comparison(test_rows, test_actuals):
     print("FPR : " + str(me.false_positive_rate(fp,tn)))
     
 def knn_graphs(trained_points, test_points):
+    """Graphs knn classification of points
+    
+    Args
+    trained_points - Training set
+    test_points - Test set
+    """
     training_wins_for  = []
     training_wins_against  = []
     training_loss_for  = []
@@ -573,6 +616,14 @@ def knn_graphs(trained_points, test_points):
     plt.show()
 
 def knn_graphs_correctness(trained_points, actuals_train, test_points, actuals_test):
+    """Graphs knn classification correctness of points
+    
+    Args
+    trained_points - Training set
+    actuals_train - Actual classification of training data
+    test_points - Test set
+    actuals_test - Actual classification of test data
+    """
     training_correct_for  = []
     training_correct_against  = []
     training_incorrect_for  = []
@@ -621,6 +672,13 @@ def knn_graphs_correctness(trained_points, actuals_train, test_points, actuals_t
     plt.show()
 
 def lr_graphs(trained_rows, test_rows, weights):
+    """Graphs logistic regression classification of points
+    
+    Args
+    trained_points - Training set
+    test_points - Test set
+    weights - Weights for regression
+    """
     training_wins_for  = []
     training_wins_against  = []
     training_loss_for  = []
@@ -658,6 +716,15 @@ def lr_graphs(trained_rows, test_rows, weights):
     plt.show()
 
 def lr_graphs_correctness(trained_rows, actuals_train, test_rows, actuals_test,weights):
+    """Graphs logistic regression classification correctness of points
+    
+    Args
+    trained_points - Training set
+    actuals_train - Actual classification of training data
+    test_points - Test set
+    actuals_test - Actual classification of test data
+    weights - Weights for regression
+    """
     training_correct_for  = []
     training_correct_against  = []
     training_incorrect_for  = []
